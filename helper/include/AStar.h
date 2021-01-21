@@ -8,6 +8,7 @@
 #include "vector"
 #include <cmath>
 #include <list>
+#include <memory>
 #include <algorithm>
 #include "InfluenceMapBuilder.h"
 
@@ -21,19 +22,19 @@ struct PathNode
     // Длина пути от старта (G).
     double PathLengthFromStart=10000;
     // Точка, из которой пришли в эту точку.
-    PathNode<T>* CameFrom;
+    std::shared_ptr<PathNode<T>> CameFrom;
     // Примерное расстояние до цели (H).
-    double HeuristicEstimatePathLength;
+    double HeuristicEstimatePathLength= 0;;
     double potential = 0; 
 
     std::vector<Vect2D> path = {};
     // Ожидаемое полное расстояние до цели (F).
     double EstimateFullPathLength() {
-        return  potential;//this->PathLengthFromStart+ this->HeuristicEstimatePathLength
+        return  potential+ this->HeuristicEstimatePathLength;//this->PathLengthFromStart
     }
 
     const double EstimateFullPathLengthConst() const {
-        return potential;//this->PathLengthFromStart + + this->HeuristicEstimatePathLength 
+        return potential+ this->HeuristicEstimatePathLength ;//this->PathLengthFromStart + 
     }
 
     bool operator < (const PathNode &node) const
@@ -62,7 +63,7 @@ public :
 
     std::vector<Vect2D> GetPathForNode(PathNode pathNode);
 
-    std::vector<PathNode> GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr);//, const Game &game, const Unit &currentUnit
+    std::vector<PathNode> GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr, bool isDiag);//, const Game &game, const Unit &currentUnit
 
     std::vector<Vect2D> FindPath(Vect2D from, Vect2D to, int sizeX, int sizeY,double** matr);//, const Game &game, const Unit &currentUnit
 };

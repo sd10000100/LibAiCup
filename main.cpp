@@ -26,11 +26,16 @@ int main(int argc, char* argv[])
 {
 	InfluenceMap<int> inf = InfluenceMap<int>(8,8,0);
 	inf.PutPotential(5, 1, Point2D<int>(7,1));
-	inf.PutPotential(7, 1, Point2D<int>(1,7));
-	//inf.ShowMap();
+	inf.PutPotential(7, 1, Point2D<int>(1,5));
+	inf.ShowMap();
 
 	AStar<int> star = AStar<int>();
 	auto ddd = star.FindPath(Point2D<int>(0,0),Point2D<int>(7,7),8,8,inf.matr );
+	for(Point2D<int> p : ddd)
+			{
+				std::cout<<p.x<<" "<<p.y<<std::endl;
+			}
+	std::cout<<ddd.size()<<std::endl;
 	for (int i=0;i<inf.sizeX;i++) {
         for (int j=0;j<inf.sizeY;j++) {
 			bool isStep = false;

@@ -3,7 +3,7 @@
 //
 
 #include "../include/AStar.h"
-
+#include <iostream>
 // using Vect2D = Vect2D<T>;
 // using PathNode = PathNode<T>;
 
@@ -30,14 +30,17 @@ PathNode<T> AStar<T>::GetMinF(std::list<PathNode> list)
 {
     PathNode minElem;
     double minVal = 10000;
+    double minPath = 10000;
 
     for(PathNode &item : list)
     {
-        double temp = item.EstimateFullPathLength();
-        if(temp<minVal)
+        double temp = item.EstimateFullPathLength();;;
+       // double temp2 = item.PathLengthFromStart;
+        if(temp<minVal) //&&  || (temp==minVal && temp2<minPath)
         {
             minElem = item;
             minVal = temp;
+            //minPath = temp2;
         }
     }
     return minElem;
@@ -46,20 +49,20 @@ PathNode<T> AStar<T>::GetMinF(std::list<PathNode> list)
 template<typename T>
 std::vector<Point2D<T>> AStar<T>::GetPathForNode(PathNode pathNode)
 {
-    return pathNode.path;
-//    std::vector<Vec2Int> result = {};
-//    PathNode* currentNode = &pathNode;
-//    while (currentNode != nullptr)
-//    {
-//        result.push_back(currentNode->Position);
-//        currentNode = currentNode->CameFrom;
-//    }
-//    std::reverse(std::begin(result), std::end(result));
-//    return result;
+   return pathNode.path;
+   std::vector<Vect2D> result = {};
+   PathNode* currentNode = &pathNode;
+   while (currentNode != nullptr)
+   {
+       result.push_back(currentNode->Position);
+       *currentNode =  *currentNode->CameFrom;
+   }
+   std::reverse(std::begin(result), std::end(result));
+   return result;
 }
 
 template<typename T>
-std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr)
+std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr, bool isDiag)
 {
     std::vector<PathNode> result ={};
 
@@ -72,11 +75,12 @@ std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,
     neighbourPoints.push_back(Vect2D(x - 1, y));
     neighbourPoints.push_back(Vect2D(x, y + 1));
     neighbourPoints.push_back(Vect2D(x, y - 1));
-
-    neighbourPoints.push_back(Vect2D(x + 1, y-1));
-    neighbourPoints.push_back(Vect2D(x - 1, y-1));
-    neighbourPoints.push_back(Vect2D(x+1, y + 1));
-    neighbourPoints.push_back(Vect2D(x-1, y + 1));
+    if (isDiag){
+        neighbourPoints.push_back(Vect2D(x + 1, y-1));
+        neighbourPoints.push_back(Vect2D(x - 1, y-1));
+        neighbourPoints.push_back(Vect2D(x+1, y + 1));
+        neighbourPoints.push_back(Vect2D(x-1, y + 1));
+    }
 
     for (Vect2D point : neighbourPoints)
     {
@@ -85,35 +89,23 @@ std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,
             continue;
         if (point.y < 0 || point.y >= sizeY)
             continue;
-        // Проверяем, что по клетке можно ходить.
-        // auto temp = game.level.tiles[point.x][point.y];
-        // if ((temp == Tile::WALL))
-        //     continue;
-        // bool isSomeUnitNear = false;
-        // for(auto unit : game.units)
-        // {
-        //     if(unit.id!=currentUnit.id)
-        //     {
-        //         if(isPointInUnit(point, currentUnit.position, currentUnit.size))
-        //             isSomeUnitNear = true;
-        //     }
-        // }
-        // if(isSomeUnitNear)
-        //     continue;
-        // Заполняем данные для точки маршрута.
         PathNode neighbourNode;
         neighbourNode.Position.x = point.x;
         neighbourNode.Position.y = point.y;
-        neighbourNode.path = pathNode.path;
-        neighbourNode.potential = pathNode.potential + matr[point.x][point.y];
+        neighbourNode.path =  {};//pathNode.path;//{};// pathNode.path;
+        
         //neighbourNode.CameFrom = &pathNode;
-//        for(auto item : pathNode.path)
-//        {
-//            neighbourNode.path.push_back(Vec2Int(item.x, item.y));
-//        }
+        int i = 0;
+       for(auto item : pathNode.path)
+       {
+           //if(i<pathNode.path.size()-1)
+           neighbourNode.path.push_back(Vect2D(item.x, item.y));
+           //i++;
+       }
         neighbourNode.path.push_back(Vect2D(pathNode.Position.x, pathNode.Position.y));
-        neighbourNode.PathLengthFromStart = pathNode.PathLengthFromStart +1,
-                neighbourNode.HeuristicEstimatePathLength = neighbourNode.potential;// GetHeuristicPathLength(point, goal);
+        neighbourNode.PathLengthFromStart = pathNode.PathLengthFromStart +1;//neighbourNode.PathLengthFromStart +
+        neighbourNode.potential =  pathNode.potential + matr[point.x][point.y];
+        neighbourNode.HeuristicEstimatePathLength = GetHeuristicPathLength(neighbourNode.Position, goal);
         result.push_back(neighbourNode);
     }
     return result;
@@ -142,7 +134,7 @@ std::vector<Point2D<T>> AStar<T>::FindPath(Vect2D from, Vect2D to, int sizeX, in
     startNode.Position = from;
     startNode.PathLengthFromStart = 0;
     startNode.potential = matr[from.x][from.y];
-            startNode.HeuristicEstimatePathLength = startNode.potential;//GetHeuristicPathLength(from, to);
+    startNode.HeuristicEstimatePathLength = GetHeuristicPathLength(from, to);
             
 
     Idle.push_back(startNode);
@@ -163,7 +155,7 @@ std::vector<Point2D<T>> AStar<T>::FindPath(Vect2D from, Vect2D to, int sizeX, in
         visited.push_back(currentNode);
 
         // Шаг 6.
-        auto neighs = GetNeighbours(currentNode, to, width, height, matr);
+        auto neighs = GetNeighbours(currentNode, to, width, height, matr, true);
         for (auto neighbourNode : neighs) {
             // Шаг 7.
 //            if (GetCountByPosition(neighbourNode.Position, visited, game) > 0)
@@ -175,21 +167,13 @@ std::vector<Point2D<T>> AStar<T>::FindPath(Vect2D from, Vect2D to, int sizeX, in
             // Шаг 8.
             if (idleNodeIter == Idle.end())
                 Idle.push_back(neighbourNode);
-            else if (idleNodeIter->PathLengthFromStart > neighbourNode.PathLengthFromStart) {
+            else if (idleNodeIter->PathLengthFromStart > neighbourNode.PathLengthFromStart )
+            // || 
+           // (idleNodeIter->PathLengthFromStart == neighbourNode.PathLengthFromStart && idleNodeIter->potential>neighbourNode.potential))
+            {
                 // Шаг 9.
-
-                idleNodeIter->CameFrom = &neighbourNode;
-                idleNodeIter->path = {};
-                //neighbourNode.CameFrom = &pathNode;
-                for(auto item : neighbourNode.path)
-                {
-                    idleNodeIter->path.push_back(Vect2D(item.x, item.y));
-                }
-                idleNodeIter->path.push_back(Vect2D(neighbourNode.Position.x, neighbourNode.Position.y));
-                //neighbourNode.CameFrom = &pathNode;
-
+                idleNodeIter->path = neighbourNode.path;
                 idleNodeIter->PathLengthFromStart = neighbourNode.PathLengthFromStart;
-                //Idle.push_back(*openNode);
             }
         }
 
