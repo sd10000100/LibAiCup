@@ -14,24 +14,58 @@ class InfluenceMap{
     using Point2D = Point2D<T>;
 
     public:
+        // Создание потенциального поля 
+        // sizeX - ширина карты
+        // sizeY - высота карты
+        // initValue - инициализирующее значение для заполнения ячеек карты 
         InfluenceMap(int sizeX, int sizeY, T initValue);
+        // Деструктор
         ~InfluenceMap();
-        double** matr;
-        int sizeX;
-        int sizeY;
-        void ShowMap();
-        void PutPotential(double power, double step, Point2D p);
-        void PutAvgPotential(double power, double step, Point2D p);
-        double getSumOfVectorOnInfluenceMap(Point2D fromV, Point2D toV);
-        Point2D GetMinPotentialByRadius(int radius, Point2D source);
+        // Карта влияния
+        const double** field();
+        // Ширина
+        const int sizeX();
+        // Высота
+        const int sizeY();
+        // Вывести в консоль карту
+        void showMap();
+        // Очистить карту, заполнив указанным значением
+        // initValue - инициализирующее значение для заполнения ячеек карты 
+        void clearMap(T initValue);
+
+        // Нанести потенциал на карту. 
+        // Ячейка заполняется максимальным потенциалом из нанесенных
+        // power - сила потенциала
+        // step - на сколько затухает сила потенциала с каждой волной на карте
+        // point - точка нанесения потенциала на карту
+        void putPotential(double power, double step, Point2D point);
+
+        // Нанести потенциал на карту. 
+        // Ячейка заполняется средним потенциалом из нового и нанесенных
+        // power - сила потенциала
+        // step - на сколько затухает сила потенциала с каждой волной на карте
+        // point - точка нанесения потенциала на карту
+        void putAvgPotential(double power, double step, Point2D point);
+
+        // Получить сумму ячеек на пути из точки from в точку to
+        // from, to - начальная и конечная точки
+        // Result - сумма ячеек на пути из точки from в точку to
+        double getSumOfVectorOnInfluenceMap(Point2D from, Point2D to);
+
+        // Получить точку на расстоянии radius с минимальным потенциалом
+        // radius - на каком радиусе искать точку
+        // source - точка, из которой ищется направление
+        // Result - точка на расстоянии radius с минимальным потенциалом
+        Point2D getMinPotentialByRadius(int radius, Point2D source);
     private:
-        
-        
-        double **array_generator(unsigned int dim1, unsigned int dim2);
-        void array_destroyer(double **ary, unsigned int dim1);
+        double** field_; //T** ?
+        int sizeX_;
+        int sizeY_;
+        int behindWallValue_ = 80;
+        void array_destroyer(double **ary, unsigned int height);
         int signedMax(int a, int b);
         int getSign(int x);
-        double putp(double oldV, double newV);
+        double getAvgValue(double oldV, double newV);
         bool isCorrectCoordinate(int x, int y);
 };
 

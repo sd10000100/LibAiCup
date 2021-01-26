@@ -1,32 +1,17 @@
 //
 // Created by badru on 15.01.2020.
-//
+// Классы узла карты и поиска пути. Определение
 
-#include "../include/AStar.h"
-#include <iostream>
-// using Vect2D = Vect2D<T>;
-// using PathNode = PathNode<T>;
+#include "AStar.h"
 
 template<typename T>
-bool AStar<T>::isPointInUnit(const Vect2D point, const Vect2D unitPosition, const Vect2D unitSize)
-{    
-    return point.x >= unitPosition.x - unitSize.x / 2
-           &&
-           point.x <= unitPosition.x + unitSize.x / 2
-           &&
-           point.y >= unitPosition.y
-           &&
-           point.y <= unitPosition.y + unitSize.y;
-}
-
-template<typename T>
-double AStar<T>::GetHeuristicPathLength(Vect2D from, Vect2D to)
+double AStar<T>::getHeuristicPathLength(Vect2D from, Vect2D to)
 {
     return fabs(from.x - to.x) + fabs(from.y - to.y);
 }
 
 template<typename T>
-PathNode<T> AStar<T>::GetMinF(std::list<PathNode> list)
+PathNode<T> AStar<T>::getMinF(std::list<PathNode> list)
 {
     PathNode minElem;
     double minVal = 10000;
@@ -34,47 +19,47 @@ PathNode<T> AStar<T>::GetMinF(std::list<PathNode> list)
 
     for(PathNode &item : list)
     {
-        double temp = item.EstimateFullPathLength();;;
-       // double temp2 = item.PathLengthFromStart;
-        if(temp<minVal) //&&  || (temp==minVal && temp2<minPath)
+        double temp = item.estimateFullPathLength();
+        if(temp<minVal)
         {
             minElem = item;
             minVal = temp;
-            //minPath = temp2;
         }
     }
     return minElem;
 }
 
 template<typename T>
-std::vector<Point2D<T>> AStar<T>::GetPathForNode(PathNode pathNode)
+std::vector<Point2D<T>> AStar<T>::getPathForNode(PathNode pathNode)
 {
-   return pathNode.path;
-   std::vector<Vect2D> result = {};
-   PathNode* currentNode = &pathNode;
-   while (currentNode != nullptr)
-   {
-       result.push_back(currentNode->Position);
-       *currentNode =  *currentNode->CameFrom;
-   }
-   std::reverse(std::begin(result), std::end(result));
-   return result;
+    // В целях экономии возможно придется переписать
+    return pathNode.path;
+//    std::vector<Vect2D> result = {};
+//    PathNode* currentNode = &pathNode;
+//    while (currentNode != nullptr)
+//    {
+//        result.push_back(currentNode->Position);
+//        *currentNode =  *currentNode->CameFrom;
+//    }
+//    std::reverse(std::begin(result), std::end(result));
+//    return result;
 }
 
 template<typename T>
-std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr, bool isDiag)
+std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2D goal,int sizeX, int sizeY, const double** field, bool isDiag)
 {
     std::vector<PathNode> result ={};
 
-// Соседними точками являются соседние по стороне клетки.
+    // Соседними точками являются соседние по стороне клетки.
     std::vector<Vect2D> neighbourPoints = {};
 
-    int x = floor(pathNode.Position.x);
-    int y = floor(pathNode.Position.y);
+    int x = floor(currentPathNode.position.x);
+    int y = floor(currentPathNode.position.y);
     neighbourPoints.push_back(Vect2D(x + 1, y));
     neighbourPoints.push_back(Vect2D(x - 1, y));
     neighbourPoints.push_back(Vect2D(x, y + 1));
     neighbourPoints.push_back(Vect2D(x, y - 1));
+
     if (isDiag){
         neighbourPoints.push_back(Vect2D(x + 1, y-1));
         neighbourPoints.push_back(Vect2D(x - 1, y-1));
@@ -90,31 +75,25 @@ std::vector<PathNode<T>> AStar<T>::GetNeighbours(PathNode pathNode, Vect2D goal,
         if (point.y < 0 || point.y >= sizeY)
             continue;
         PathNode neighbourNode;
-        neighbourNode.Position.x = point.x;
-        neighbourNode.Position.y = point.y;
-        neighbourNode.path =  {};//pathNode.path;//{};// pathNode.path;
-        
-        //neighbourNode.CameFrom = &pathNode;
-        int i = 0;
-       for(auto item : pathNode.path)
-       {
-           //if(i<pathNode.path.size()-1)
-           neighbourNode.path.push_back(Vect2D(item.x, item.y));
-           //i++;
-       }
-        neighbourNode.path.push_back(Vect2D(pathNode.Position.x, pathNode.Position.y));
-        neighbourNode.PathLengthFromStart = pathNode.PathLengthFromStart +1;//neighbourNode.PathLengthFromStart +
-        neighbourNode.potential =  pathNode.potential + matr[point.x][point.y];
-        neighbourNode.HeuristicEstimatePathLength = GetHeuristicPathLength(neighbourNode.Position, goal);
+        neighbourNode.position.x = point.x;
+        neighbourNode.position.y = point.y;
+        neighbourNode.path =  currentPathNode.path;
+        neighbourNode.path.push_back(Vect2D(currentPathNode.position.x, currentPathNode.position.y));
+        neighbourNode.pathLengthFromStart = currentPathNode.pathLengthFromStart +1;
+        neighbourNode.potential =  currentPathNode.potential + field[point.x][point.y];
+        neighbourNode.heuristicEstimatePathLength = getHeuristicPathLength(neighbourNode.position, goal);
         result.push_back(neighbourNode);
     }
     return result;
 }
 
+//
 template<typename T>
-std::vector<Point2D<T>> AStar<T>::FindPath(Vect2D from, Vect2D to, int sizeX, int sizeY,double** matr)
+std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field)
 {
-    std::list<PathNode> Idle = {};
+    // Шаг 1. Создается 2 списка вершин — ожидающие рассмотрения и уже рассмотренные. 
+    // В ожидающие добавляется точка старта, список рассмотренных пока пуст.
+    std::list<PathNode> idle = {};
     std::list<PathNode> visited = {};
 
     from.x = floor(from.x);
@@ -123,62 +102,52 @@ std::vector<Point2D<T>> AStar<T>::FindPath(Vect2D from, Vect2D to, int sizeX, in
     to.x = floor(to.x);
     to.y = floor(to.y);
 
-
     int width = sizeX;
     int height = sizeY;
 
-    // Шаг 2.
     PathNode startNode = PathNode();
-    startNode.CameFrom = nullptr;
     startNode.path = {};
-    startNode.Position = from;
-    startNode.PathLengthFromStart = 0;
-    startNode.potential = matr[from.x][from.y];
-    startNode.HeuristicEstimatePathLength = GetHeuristicPathLength(from, to);
+    startNode.position = from;
+    startNode.pathLengthFromStart = 0;
+    startNode.potential = field[from.x][from.y];
+    startNode.heuristicEstimatePathLength = getHeuristicPathLength(from, to);
             
+    idle.push_back(startNode);
 
-    Idle.push_back(startNode);
-
-    while (Idle.size()> 0) {
-
-//        std::cerr<<"Idle size: "<< Idle.size()<<'\n';
-//        std::cerr<<"visited size: "<< visited.size()<<'\n';
-
-        PathNode currentNode = GetMinF(Idle);
-        if (floor(currentNode.Position.x) == floor(to.x) && floor(currentNode.Position.y) == floor(to.y)) {
-            return GetPathForNode(currentNode);
+    while (idle.size()> 0) {
+        // Шаг 2. Для каждой точки рассчитывается F = G + H. G — расстояние от старта до точки, H — примерное расстояние от точки до цели
+        // Шаг 3. Из списка точек на рассмотрение выбирается точка с наименьшим F
+        PathNode currentNode = getMinF(idle);
+        if (floor(currentNode.position.x) == floor(to.x) && floor(currentNode.position.y) == floor(to.y)) {
+            // Шаг 4. Если точка — цель, то мы нашли маршрут
+            return getPathForNode(currentNode);
         }
-        // Шаг 5.
+        // Шаг 5. Переносим точку из списка ожидающих рассмотрения в список уже рассмотренных.
 
-        //Idle = removeItemFromList(currentNode, Idle);
-        Idle.pop_front();
+        idle.pop_front();
         visited.push_back(currentNode);
 
-        // Шаг 6.
-        auto neighs = GetNeighbours(currentNode, to, width, height, matr, true);
+        // Шаг 6. Получаем список соседних точек
+        auto neighs = getNeighbours(currentNode, to, width, height, field, true);
         for (auto neighbourNode : neighs) {
-            // Шаг 7.
-//            if (GetCountByPosition(neighbourNode.Position, visited, game) > 0)
-//                continue;
+            // Шаг 7. Если соседняя точка уже находится в рассмотренных — пропускаем ее
             auto visitedNodeIter = std::find(visited.begin(), visited.end(), neighbourNode);
             if(visitedNodeIter!=visited.end())
                 continue;
-            auto idleNodeIter = std::find(Idle.begin(), Idle.end(), neighbourNode);
-            // Шаг 8.
-            if (idleNodeIter == Idle.end())
-                Idle.push_back(neighbourNode);
-            else if (idleNodeIter->PathLengthFromStart > neighbourNode.PathLengthFromStart )
-            // || 
-           // (idleNodeIter->PathLengthFromStart == neighbourNode.PathLengthFromStart && idleNodeIter->potential>neighbourNode.potential))
+            auto idleNodeIter = std::find(idle.begin(), idle.end(), neighbourNode);
+            // Шаг 8. Если соседней точки еще нет в списке на ожидание — добавляем ее туда
+            if (idleNodeIter == idle.end())
+                idle.push_back(neighbourNode);
+            else if (idleNodeIter->pathLengthFromStart > neighbourNode.pathLengthFromStart )
             {
-                // Шаг 9.
+                // Шаг 9.Если же соседняя точка в списке на рассмотрение — 
+                // проверяем, если пришли более коротким путем, заменяем предыдущиую точку и путь
                 idleNodeIter->path = neighbourNode.path;
-                idleNodeIter->PathLengthFromStart = neighbourNode.PathLengthFromStart;
+                idleNodeIter->pathLengthFromStart = neighbourNode.pathLengthFromStart;
             }
         }
 
     }
-    // Шаг 10.
+    // Шаг 10. Если список точек на рассмотрение пуст, а до цели мы так и не дошли — значит маршрут не существует.
     return {};
 }
-// A*

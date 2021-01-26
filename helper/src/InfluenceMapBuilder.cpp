@@ -1,18 +1,24 @@
-#include "../include/InfluenceMapBuilder.h"
+#include "InfluenceMapBuilder.h"
 #include <iostream>
 
 template<typename T>
-double InfluenceMap<T>::**array_generator(unsigned int dim1, unsigned int dim2) {
-    double **ptrary = new double * [dim1];
-    for (int i = 0; i < dim1; i++) {
-        ptrary[i] = new double [dim2];
-    }
-    return ptrary;
+const double** InfluenceMap<T>::field(){
+    return (const double**)this->field_;
 }
 
 template<typename T>
-void InfluenceMap<T>::array_destroyer(double **ary, unsigned int dim1) {
-    for (int i = 0; i < dim1; i++) {
+const int InfluenceMap<T>::sizeX(){
+    return this->sizeX_;
+}
+
+template<typename T>
+const int InfluenceMap<T>::sizeY(){
+    return this->sizeY_;
+}
+
+template<typename T>
+void InfluenceMap<T>::array_destroyer(double **ary, unsigned int height) {
+    for (int i = 0; i < height; i++) {
         delete [] ary[i];
     }
     delete [] ary;
@@ -20,45 +26,53 @@ void InfluenceMap<T>::array_destroyer(double **ary, unsigned int dim1) {
 
 template<typename T>
 InfluenceMap<T>::InfluenceMap(int sizeX, int sizeY, T initValue){
-    this->matr = new double * [sizeX];
+    this->field_ = new double * [sizeX];
     for (int i = 0; i < sizeX; i++) {
-        this->matr[i] = new double [sizeY];
+        this->field_[i] = new double [sizeY];
     }
-    this->sizeX = sizeX;
-    this->sizeY = sizeY;
+    this->sizeX_ = sizeX;
+    this->sizeY_ = sizeY;
     for (int i=0;i<sizeX;i++) {
         for (int j=0;j<sizeY;j++) {
-            this->matr[i][j] = initValue;
+            this->field_[i][j] = initValue;
         }
     }
 }
 
 template<typename T>
 InfluenceMap<T>::~InfluenceMap(){
-    array_destroyer(this->matr, this->sizeX);
+    array_destroyer(this->field_, this->sizeX_);
 }
 
 template<typename T>
-void InfluenceMap<T>::ShowMap(){
-    for (int i=0;i<sizeX;i++) {
-        for (int j=0;j<sizeY;j++) {
-            std::cout<<this->matr[i][j]<<" ";
+void InfluenceMap<T>::showMap(){
+    for (int i=0;i<sizeX_;i++) {
+        for (int j=0;j<sizeY_;j++) {
+            std::cout<<this->field_[i][j]<<" ";
         }
         std::cout<<std::endl;
     }
 }
 
-
-
 template<typename T>
-int InfluenceMap<T>::signedMax(int a, int b)
-{
+void InfluenceMap<T>::clearMap(T initValue){
+    for (int i=0;i<sizeX_;i++) {
+        for (int j=0;j<sizeY_;j++) {
+            this->matr[i][j] = initValue;
+        }
+    }
+}
+
+// получить максимальное по модулю
+template<typename T>
+int InfluenceMap<T>::signedMax(int a, int b) {
     if(abs(a)>=abs(b))
         return a;
     else return b;
 
 }
 
+// получить знак числа
 template<typename T>
 int InfluenceMap<T>::getSign(int x)
 {
@@ -68,39 +82,47 @@ int InfluenceMap<T>::getSign(int x)
 }
 
 template<typename T>
-void InfluenceMap<T>::PutPotential(double power, double step, Point2D p)
+bool InfluenceMap<T>::isCorrectCoordinate(int x, int y)
+{
+    if(x>=0 && x<sizeX_ && y>=0 && y<sizeY_)
+        return true;
+    return false;
+}
+
+template<typename T>
+void InfluenceMap<T>::putPotential(double power, double step, Point2D point)
 {
     int s = 0;
-    int x = int(abs(floor(p.x)));
-    int y = int(abs(floor(p.y)));
+    int x = int(abs(floor(point.x)));
+    int y = int(abs(floor(point.y)));
     for(int l = 0;l<fabs(power);l=l+step, s++)
     {
         for(int temp = y-s;temp<=s+y;temp++)
         {
             int tempArrMinX = int(floor(x-s));
             int tempArrMaxX = int(floor(x+s));
-            if(tempArrMinX>=0 && tempArrMinX<sizeX && temp>=0 && temp<sizeY)
-                matr[tempArrMinX][temp]=signedMax(matr[tempArrMinX][temp],getSign(power)*(abs(power)-l));
-            if(tempArrMaxX<sizeX && tempArrMaxX>=0 && temp>=0 && temp<sizeY)
-                matr[tempArrMaxX][temp]=signedMax(matr[tempArrMaxX][temp],getSign(power)*(abs(power)-l));
+            if(isCorrectCoordinate(tempArrMinX, temp))
+                field_[tempArrMinX][temp]=signedMax(field_[tempArrMinX][temp],getSign(power)*(abs(power)-l));
+            if(isCorrectCoordinate(tempArrMaxX, temp))
+                field_[tempArrMaxX][temp]=signedMax(field_[tempArrMaxX][temp],getSign(power)*(abs(power)-l));
         }
         for(int temp = x-s+1;temp<=s+x-1;temp++)
         {
             int tempArrMinY = int(floor(y-s));
             int tempArrMaxY = int(floor(y+s));
-            if(tempArrMinY>=0 && tempArrMinY<sizeY && temp>=0 && temp<sizeX)
-                matr[temp][tempArrMinY]=signedMax(matr[temp][tempArrMinY],getSign(power)*(abs(power)-l));
-            if(tempArrMaxY>=0 && tempArrMaxY<sizeY  && temp>=0 && temp<sizeX)
-                matr[temp][tempArrMaxY]=signedMax(matr[temp][tempArrMaxY],getSign(power)*(abs(power)-l));
+            if(isCorrectCoordinate(temp, tempArrMinY))
+                field_[temp][tempArrMinY]=signedMax(field_[temp][tempArrMinY],getSign(power)*(abs(power)-l));
+            if(isCorrectCoordinate(temp, tempArrMaxY))
+                field_[temp][tempArrMaxY]=signedMax(field_[temp][tempArrMaxY],getSign(power)*(abs(power)-l));
         }
     }
 }
 
 template<typename T>
-double InfluenceMap<T>::putp(double oldV, double newV)
+double InfluenceMap<T>::getAvgValue(double oldV, double newV)
 {
-    if(oldV==80)
-        return 80;
+    if(oldV==behindWallValue_)
+        return behindWallValue_;
     else if(oldV == 0)
         return newV;
     else
@@ -108,8 +130,9 @@ double InfluenceMap<T>::putp(double oldV, double newV)
 
 }
 
+
 template<typename T>
-void InfluenceMap<T>::PutAvgPotential(double power, double step, Point2D p)
+void InfluenceMap<T>::putAvgPotential(double power, double step, Point2D p)
 {
     int s = 0;
     int x = int(abs(floor(p.x)));
@@ -120,30 +143,24 @@ void InfluenceMap<T>::PutAvgPotential(double power, double step, Point2D p)
         {
             int tempArrMinX = int(floor(x-s));
             int tempArrMaxX = int(floor(x+s));
-            if(tempArrMinX>=0 && tempArrMinX<sizeX && temp>=0 && temp<sizeY && matr[tempArrMinX][temp]<80)
-                matr[tempArrMinX][temp]=putp(matr[tempArrMinX][temp],getSign(power)*(abs(power)-l));
-            if(tempArrMaxX<sizeX && tempArrMaxX>=0 && temp>=0 && temp<sizeY && matr[tempArrMaxX][temp]<80)
-                matr[tempArrMaxX][temp]=putp(matr[tempArrMaxX][temp],getSign(power)*(abs(power)-l));
+            if(tempArrMinX>=0 && tempArrMinX<sizeX && temp>=0 && temp<sizeY && field_[tempArrMinX][temp]<behindWallValue_)
+                field_[tempArrMinX][temp]=getAvgValue(field_[tempArrMinX][temp],getSign(power)*(abs(power)-l));
+            if(tempArrMaxX<sizeX && tempArrMaxX>=0 && temp>=0 && temp<sizeY && field_[tempArrMaxX][temp]<behindWallValue_)
+                field_[tempArrMaxX][temp]=getAvgValue(field_[tempArrMaxX][temp],getSign(power)*(abs(power)-l));
         }
         for(int temp = x-s+1;temp<=s+x-1;temp++)
         {
             int tempArrMinY = int(floor(y-s));
             int tempArrMaxY = int(floor(y+s));
-            if(tempArrMinY>=0 && tempArrMinY<sizeY && temp>=0 && temp<sizeX && matr[temp][tempArrMinY]<80)
-                matr[temp][tempArrMinY]=putp(matr[temp][tempArrMinY],getSign(power)*(abs(power)-l));
-            if(tempArrMaxY>=0 && tempArrMaxY<sizeY  && temp>=0 && temp<sizeX && matr[temp][tempArrMaxY]<80)
-                matr[temp][tempArrMaxY]=putp(matr[temp][tempArrMaxY],getSign(power)*(abs(power)-l));
+            if(tempArrMinY>=0 && tempArrMinY<sizeY && temp>=0 && temp<sizeX && field_[temp][tempArrMinY]<behindWallValue_)
+                field_[temp][tempArrMinY]=getAvgValue(field_[temp][tempArrMinY],getSign(power)*(abs(power)-l));
+            if(tempArrMaxY>=0 && tempArrMaxY<sizeY  && temp>=0 && temp<sizeX && field_[temp][tempArrMaxY]<behindWallValue_)
+                field_[temp][tempArrMaxY]=getAvgValue(field_[temp][tempArrMaxY],getSign(power)*(abs(power)-l));
         }
     }
 }
 
-template<typename T>
-bool InfluenceMap<T>::isCorrectCoordinate(int x, int y)
-{
-    if(x>=0 && x<sizeX && y>=0 && y<sizeY)
-        return true;
-    return false;
-}
+
 
 template<typename T>
 double InfluenceMap<T>::getSumOfVectorOnInfluenceMap(Point2D fromV, Point2D toV){
@@ -167,17 +184,17 @@ double InfluenceMap<T>::getSumOfVectorOnInfluenceMap(Point2D fromV, Point2D toV)
                     intersect<T>(fromV, toV, Point2D(size_t(i), size_t(j) + 1),
                               Point2D(size_t(i) + 1, size_t(j) + 1))
             )) {
-                sum += matr[i][j];
+                sum += field_[i][j];
             }
             else if(!isCorrectCoordinate(i, j, sizeX, sizeY))
-            {sum +=80;}
+            {sum +=behindWallValue_;}
         }
     }
     return sum;
 }
 
 template<typename T>
-Point2D<T> InfluenceMap<T>::GetMinPotentialByRadius(int radius, Point2D source) {
+Point2D<T> InfluenceMap<T>::getMinPotentialByRadius(int radius, Point2D source) {
 
     double min = 10000;
     Point2D minPos = source;

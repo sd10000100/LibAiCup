@@ -6,6 +6,7 @@
 #define LIBAICUP_VECT2D_H
 
 #include "Point2D.h"
+// TODO: дописать а то несолидно
 
 template<typename T>
 struct Vect2D {

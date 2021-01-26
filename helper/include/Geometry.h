@@ -7,7 +7,7 @@
 
 // расстояние между 2-мя точками
 template<typename T>
-inline double distanceSqr(Vect2D<T> a, Vect2D<T> b) {
+double distanceSqr(Vect2D<T> a, Vect2D<T> b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
 
@@ -19,7 +19,7 @@ inline double distanceSqr(Vect2D<T> a, Vect2D<T> b) {
 //    |x2 y2 1|=(x2-x1)(y3-y1)-(y2-y1)(x3-x1)
 //    |x3 y3 1|
 template<typename T>
-double OrientedArea (Point2D<T> a, Point2D<T> b, Point2D<T> c) {
+double orientedArea (Point2D<T> a, Point2D<T> b, Point2D<T> c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 

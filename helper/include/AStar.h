@@ -1,6 +1,6 @@
 //
 // Created by badru on 15.01.2020.
-//
+// Классы узла карты и поиска пути. Обьявление
 
 #ifndef LIBAICUP_ASTAR_H
 #define LIBAICUP_ASTAR_H
@@ -10,62 +10,83 @@
 #include <list>
 #include <memory>
 #include <algorithm>
-#include "InfluenceMapBuilder.h"
+#include "Point2D.h"
 
-// A*
+// Узел на карте поиска пути
 template<typename T>
 struct PathNode
 {
     using Vect2D = Point2D<T>;
     // Координаты точки на карте.
-    Vect2D Position;
+    Vect2D position;
     // Длина пути от старта (G).
-    double PathLengthFromStart=10000;
+    double pathLengthFromStart=10000;
     // Точка, из которой пришли в эту точку.
-    std::shared_ptr<PathNode<T>> CameFrom;
-    // Примерное расстояние до цели (H).
-    double HeuristicEstimatePathLength= 0;;
-    double potential = 0; 
-
+    std::shared_ptr<PathNode<T>> cameFrom;
+    // Весь путь до точки
     std::vector<Vect2D> path = {};
+    // Примерное расстояние до цели (H).
+    double heuristicEstimatePathLength= 0;
+    // Вес на данной точке (на взвешенной карте)
+    double potential = 0; 
     // Ожидаемое полное расстояние до цели (F).
-    double EstimateFullPathLength() {
-        return  potential+ this->HeuristicEstimatePathLength;//this->PathLengthFromStart
+    double estimateFullPathLength() {
+        return  potential + this->heuristicEstimatePathLength;
     }
-
-    const double EstimateFullPathLengthConst() const {
-        return potential+ this->HeuristicEstimatePathLength ;//this->PathLengthFromStart + 
+    const double estimateFullPathLengthConst() const {
+        return potential + this->heuristicEstimatePathLength;
     }
 
     bool operator < (const PathNode &node) const
     {
-        return EstimateFullPathLengthConst()<node.EstimateFullPathLengthConst();
+        return estimateFullPathLengthConst()<node.estimateFullPathLengthConst();
     }
 
     bool operator == (const PathNode<T> &node)
     {
-        return floor(Position.x) == floor(node.Position.x) && floor(Position.y) == floor(node.Position.y);
+        return floor(position.x) == floor(node.position.x) && floor(position.y) == floor(node.position.y);
     }
 };
 
+// Класс поиска пути
 template<typename T>
 class AStar {
 public :
     using Vect2D = Point2D<T>;
     using PathNode = PathNode<T>;
     AStar(){};
+    // Получить примерное расстояние (H) от точки до цели
+    // from - точка, от которой вычисляется расстояние
+    // to - целевая точка
+    // Result - примерное расстояние (H) от точки до цели
+    double getHeuristicPathLength(Vect2D from, Vect2D to);
 
-    bool isPointInUnit(const Vect2D point, const Vect2D unitPosition, const Vect2D unitSize);
+    // Получить узел с минимальным ожидаемым расстоянием до цели
+    // pathNodes - список узлов, в котором производится поиск
+    // Result - узел с минимальным ожидаемым расстоянием до цели
+    PathNode getMinF(std::list<PathNode> pathNodes);
 
-    double GetHeuristicPathLength(Vect2D from, Vect2D to);
+    // Получить полный путь до узла
+    // pathNode - узел, от которого вычисляется пути по карте
+    // Result - полный путь до узла
+    std::vector<Vect2D> getPathForNode(PathNode pathNode);
 
-    PathNode GetMinF(std::list<PathNode> list);
+    // Получить соседние узлы для текущего узла
+    // currentPathNode - текущий узел
+    // goal - целевая точка
+    // sizeX, sizeY - размеры карты - ширина и высота
+    // field - матрица на которой вычисляется поиск пути (потенциальное поле или карта влияния)
+    // isDiagonalAllowed - true: поиск соседних узлов будет происходить так же по диагональным клеткам
+    // Result - список соседних узлов для текущего узла
+    std::vector<PathNode> getNeighbours(PathNode currentPathNode, Vect2D goal,int sizeX, int sizeY, const double** field, bool isDiagonalAllowed);
 
-    std::vector<Vect2D> GetPathForNode(PathNode pathNode);
-
-    std::vector<PathNode> GetNeighbours(PathNode pathNode, Vect2D goal,int sizeX, int sizeY, double** matr, bool isDiag);//, const Game &game, const Unit &currentUnit
-
-    std::vector<Vect2D> FindPath(Vect2D from, Vect2D to, int sizeX, int sizeY,double** matr);//, const Game &game, const Unit &currentUnit
+    // Получить полный путь до точки. Если такого не существует - возвращается пустой список
+    // from - точка начала поиска
+    // to - целевая точка
+    // sizeX, sizeY - размеры карты - ширина и высота
+    // field - матрица на которой вычисляется поиск пути (потенциальное поле или карта влияния)
+    // Result - список точек, представляющий собой самый оптимальный путь
+    std::vector<Vect2D> findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field);
 };
 
-#endif //AICUP2019_ASTAR_H
+#endif
