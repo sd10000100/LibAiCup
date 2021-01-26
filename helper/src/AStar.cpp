@@ -1,8 +1,11 @@
 //
 // Created by badru on 15.01.2020.
 // Классы узла карты и поиска пути. Определение
+// Описание алгоритма взято отсюда https://lsreg.ru/realizaciya-algoritma-poiska-a-na-c/
 
 #include "AStar.h"
+
+using namespace pathfind;
 
 template<typename T>
 double AStar<T>::getHeuristicPathLength(Vect2D from, Vect2D to)
@@ -11,7 +14,7 @@ double AStar<T>::getHeuristicPathLength(Vect2D from, Vect2D to)
 }
 
 template<typename T>
-PathNode<T> AStar<T>::getMinF(std::list<PathNode> list)
+PathNode<T> AStar<T>::getPathNodeWithMinF(std::list<PathNode> list)
 {
     PathNode minElem;
     double minVal = 10000;
@@ -117,7 +120,7 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
     while (idle.size()> 0) {
         // Шаг 2. Для каждой точки рассчитывается F = G + H. G — расстояние от старта до точки, H — примерное расстояние от точки до цели
         // Шаг 3. Из списка точек на рассмотрение выбирается точка с наименьшим F
-        PathNode currentNode = getMinF(idle);
+        PathNode currentNode = getPathNodeWithMinF(idle);
         if (floor(currentNode.position.x) == floor(to.x) && floor(currentNode.position.y) == floor(to.y)) {
             // Шаг 4. Если точка — цель, то мы нашли маршрут
             return getPathForNode(currentNode);

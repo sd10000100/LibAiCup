@@ -28,10 +28,10 @@ class InfluenceMap{
         // Высота
         const int sizeY();
         // Вывести в консоль карту
-        void showMap();
+        void show();
         // Очистить карту, заполнив указанным значением
         // initValue - инициализирующее значение для заполнения ячеек карты 
-        void clearMap(T initValue);
+        void clear(T initValue);
 
         // Нанести потенциал на карту. 
         // Ячейка заполняется максимальным потенциалом из нанесенных
@@ -50,19 +50,18 @@ class InfluenceMap{
         // Получить сумму ячеек на пути из точки from в точку to
         // from, to - начальная и конечная точки
         // Result - сумма ячеек на пути из точки from в точку to
-        double getSumOfVectorOnInfluenceMap(Point2D from, Point2D to);
+        double getSumOfVector(Point2D from, Point2D to);
 
         // Получить точку на расстоянии radius с минимальным потенциалом
         // radius - на каком радиусе искать точку
         // source - точка, из которой ищется направление
         // Result - точка на расстоянии radius с минимальным потенциалом
-        Point2D getMinPotentialByRadius(int radius, Point2D source);
+        Point2D getPointWithMinSum(int radius, Point2D source);
     private:
         double** field_; //T** ?
         int sizeX_;
         int sizeY_;
         int behindWallValue_ = 80;
-        void array_destroyer(double **ary, unsigned int height);
         int signedMax(int a, int b);
         int getSign(int x);
         double getAvgValue(double oldV, double newV);
@@ -71,4 +70,4 @@ class InfluenceMap{
 
 
 
-#endif //AICUP2019_INFLUENCEMAPBUILDER_H
+#endif

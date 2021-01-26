@@ -17,14 +17,6 @@ const int InfluenceMap<T>::sizeY(){
 }
 
 template<typename T>
-void InfluenceMap<T>::array_destroyer(double **ary, unsigned int height) {
-    for (int i = 0; i < height; i++) {
-        delete [] ary[i];
-    }
-    delete [] ary;
-}
-
-template<typename T>
 InfluenceMap<T>::InfluenceMap(int sizeX, int sizeY, T initValue){
     this->field_ = new double * [sizeX];
     for (int i = 0; i < sizeX; i++) {
@@ -41,11 +33,14 @@ InfluenceMap<T>::InfluenceMap(int sizeX, int sizeY, T initValue){
 
 template<typename T>
 InfluenceMap<T>::~InfluenceMap(){
-    array_destroyer(this->field_, this->sizeX_);
+    for (int i = 0; i < this->sizeX_; i++) {
+        delete [] this->field_[i];
+    }
+    delete [] this->field_;
 }
 
 template<typename T>
-void InfluenceMap<T>::showMap(){
+void InfluenceMap<T>::show(){
     for (int i=0;i<sizeX_;i++) {
         for (int j=0;j<sizeY_;j++) {
             std::cout<<this->field_[i][j]<<" ";
@@ -55,7 +50,7 @@ void InfluenceMap<T>::showMap(){
 }
 
 template<typename T>
-void InfluenceMap<T>::clearMap(T initValue){
+void InfluenceMap<T>::clear(T initValue){
     for (int i=0;i<sizeX_;i++) {
         for (int j=0;j<sizeY_;j++) {
             this->matr[i][j] = initValue;
@@ -163,7 +158,7 @@ void InfluenceMap<T>::putAvgPotential(double power, double step, Point2D p)
 
 
 template<typename T>
-double InfluenceMap<T>::getSumOfVectorOnInfluenceMap(Point2D fromV, Point2D toV){
+double InfluenceMap<T>::getSumOfVector(Point2D fromV, Point2D toV){
     double sum = 0;
     int sqareStartX =  fmin(floor(fromV.x), floor(toV.x));
     int sqareFinishX = fmax(ceil(fromV.x),ceil(toV.x));
@@ -194,7 +189,7 @@ double InfluenceMap<T>::getSumOfVectorOnInfluenceMap(Point2D fromV, Point2D toV)
 }
 
 template<typename T>
-Point2D<T> InfluenceMap<T>::getMinPotentialByRadius(int radius, Point2D source) {
+Point2D<T> InfluenceMap<T>::getPointWithMinSum(int radius, Point2D source) {
 
     double min = 10000;
     Point2D minPos = source;

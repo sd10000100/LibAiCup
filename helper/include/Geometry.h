@@ -7,7 +7,7 @@
 
 // расстояние между 2-мя точками
 template<typename T>
-double distanceSqr(Vect2D<T> a, Vect2D<T> b) {
+double distanceSqr(Point2D<T> a, Point2D<T> b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
 
@@ -40,8 +40,6 @@ bool intersect (Point2D<T> a, Point2D<T> b, Point2D<T> c, Point2D<T> d) {
            && OrientedArea(a,b,c) * OrientedArea(a,b,d) <= 0
            && OrientedArea(c,d,a) * OrientedArea(c,d,b) <= 0;
 }
-
-
 
 // проверка на нахождение точки внутри треугольника (подходит для выпуклых многоугольников)
 // Проверяем каждую грань на пересечение с лучом из искомой точки (луч в рандомное место)

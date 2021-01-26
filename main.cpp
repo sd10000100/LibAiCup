@@ -2,6 +2,8 @@
 #include "InfluenceMapBuilder.cpp"
 #include "AStar.cpp"
 
+using namespace pathfind;
+
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"      /* Black */
 #define RED     "\033[31m"      /* Red */
@@ -25,8 +27,8 @@ int main(int argc, char* argv[])
 	InfluenceMap<int> inf = InfluenceMap<int>(8,8,0);
 	inf.putPotential(5, 1, Point2D<int>(7,1));
 	inf.putPotential(7, 1, Point2D<int>(1,9));
-	inf.showMap();
-
+	inf.show();
+	auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
 	AStar<int> star = AStar<int>();
 	auto ddd = star.findPath(Point2D<int>(0,0),Point2D<int>(7,7),8,8,inf.field() );
 	for(Point2D<int> p : ddd)
