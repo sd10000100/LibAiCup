@@ -158,7 +158,7 @@ void InfluenceMap<T>::putAvgPotential(double power, double step, Point2D p)
 
 
 template<typename T>
-double InfluenceMap<T>::getSumOfVector(Point2D fromV, Point2D toV){
+double InfluenceMap<T>::getSumOfVectorPath(Point2D fromV, Point2D toV){
     double sum = 0;
     int sqareStartX =  fmin(floor(fromV.x), floor(toV.x));
     int sqareFinishX = fmax(ceil(fromV.x),ceil(toV.x));
@@ -168,7 +168,7 @@ double InfluenceMap<T>::getSumOfVector(Point2D fromV, Point2D toV){
     for(int i = sqareStartX; i<=sqareFinishX;i++)
     {
         for(int j = sqareStartY; j<=sqareFinishY;j++) {
-            if (isCorrectCoordinate(i, j, sizeX, sizeY) && (
+            if (isCorrectCoordinate(i, j) && (
                     intersect<T>(fromV, toV, Point2D(size_t(i), size_t(j)), Point2D(size_t(i), size_t(j) + 1))
                     ||
                     intersect<T>(fromV, toV, Point2D(size_t(i), size_t(j)), Point2D(size_t(i) + 1, size_t(j)))
@@ -181,7 +181,7 @@ double InfluenceMap<T>::getSumOfVector(Point2D fromV, Point2D toV){
             )) {
                 sum += field_[i][j];
             }
-            else if(!isCorrectCoordinate(i, j, sizeX, sizeY))
+            else if(!isCorrectCoordinate(i, j))
             {sum +=behindWallValue_;}
         }
     }
@@ -199,8 +199,8 @@ Point2D<T> InfluenceMap<T>::getPointWithMinSum(int radius, Point2D source) {
     for (int temp = y-radius+1; temp < y+radius; temp++) {
         int minX = x-radius;
         int maxX = x+radius;
-        double minSum = getSumOfVectorOnInfluenceMap(source, Point2D(minX,temp));
-        double maxSum = getSumOfVectorOnInfluenceMap(source, Point2D(maxX,temp));
+        double minSum = getSumOfVectorPath(source, Point2D(minX,temp));
+        double maxSum = getSumOfVectorPath(source, Point2D(maxX,temp));
         if(minSum<min)
         {
             min = minSum;
@@ -217,8 +217,8 @@ Point2D<T> InfluenceMap<T>::getPointWithMinSum(int radius, Point2D source) {
     for (int temp = x-radius+1; temp < x+radius; temp++) {
         int minY = y-radius;
         int maxY = y+radius;
-        double minSum = getSumOfVectorOnInfluenceMap(source, Point2D(temp,minY));
-        double maxSum = getSumOfVectorOnInfluenceMap(source, Point2D(temp,maxY));
+        double minSum = getSumOfVectorPath(source, Point2D(temp,minY));
+        double maxSum = getSumOfVectorPath(source, Point2D(temp,maxY));
         if(minSum<min)
         {
             min = minSum;

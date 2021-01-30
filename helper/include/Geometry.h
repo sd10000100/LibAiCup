@@ -37,8 +37,8 @@ template<typename T>
 bool intersect (Point2D<T> a, Point2D<T> b, Point2D<T> c, Point2D<T> d) {
     return isPointNotOnSamePlane (a.x, b.x, c.x, d.x)
            && isPointNotOnSamePlane (a.y, b.y, c.y, d.y)
-           && OrientedArea(a,b,c) * OrientedArea(a,b,d) <= 0
-           && OrientedArea(c,d,a) * OrientedArea(c,d,b) <= 0;
+           && orientedArea<T>(a,b,c) * orientedArea<T>(a,b,d) <= 0
+           && orientedArea<T>(c,d,a) * orientedArea<T>(c,d,b) <= 0;
 }
 
 // проверка на нахождение точки внутри треугольника (подходит для выпуклых многоугольников)

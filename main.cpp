@@ -28,6 +28,7 @@ int main(int argc, char* argv[])
 	inf.putPotential(5, 1, Point2D<int>(7,1));
 	inf.putPotential(7, 1, Point2D<int>(1,9));
 	inf.show();
+	auto dfg = inf.getPointWithMinSum(2, Point2D<int>(7,1));
 	auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
 	AStar<int> star = AStar<int>();
 	auto ddd = star.findPath(Point2D<int>(0,0),Point2D<int>(7,7),8,8,inf.field() );

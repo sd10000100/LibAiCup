@@ -50,7 +50,7 @@ class InfluenceMap{
         // Получить сумму ячеек на пути из точки from в точку to
         // from, to - начальная и конечная точки
         // Result - сумма ячеек на пути из точки from в точку to
-        double getSumOfVector(Point2D from, Point2D to);
+        double getSumOfVectorPath(Point2D from, Point2D to);
 
         // Получить точку на расстоянии radius с минимальным потенциалом
         // radius - на каком радиусе искать точку
