@@ -19,9 +19,11 @@ const int InfluenceMap<T>::sizeY(){
 template<typename T>
 InfluenceMap<T>::InfluenceMap(int sizeX, int sizeY, T initValue){
     this->field_ = new double * [sizeX];
-    for (int i = 0; i < sizeX; i++) {
-        this->field_[i] = new double [sizeY];
+    this->field_[0] = new double [sizeX*sizeY];
+    for (int i = 1; i != sizeX; ++i) {
+        this->field_[i] =this->field_[i-1] + sizeY;
     }
+
     this->sizeX_ = sizeX;
     this->sizeY_ = sizeY;
     for (int i=0;i<sizeX;i++) {
@@ -33,9 +35,7 @@ InfluenceMap<T>::InfluenceMap(int sizeX, int sizeY, T initValue){
 
 template<typename T>
 InfluenceMap<T>::~InfluenceMap(){
-    for (int i = 0; i < this->sizeX_; i++) {
-        delete [] this->field_[i];
-    }
+    delete [] this->field_[0];
     delete [] this->field_;
 }
 
