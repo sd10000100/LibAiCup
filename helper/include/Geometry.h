@@ -98,6 +98,7 @@ std::vector<Vect2D<T>> GetToArray(Args... args)
 // Если кол-во перемещений кратно 2-м - точка не в многоугольнике
 // инеаче - внутри
 // Примеч: можно случайно попасть на стык ребер - решается выбором луча поизощреннее
+// Примеч2: нужно, чтобы вершины были отсортированы по углу относительно центра многоугольника
 template <typename T,class... Args>
 bool isPointInPolygon(Vect2D<T> p, Args ...args){
     std::vector<Point2D<T>> points = {};
@@ -125,6 +126,28 @@ bool isPointInPolygon(Vect2D<T> p, Args ...args){
     else {
         return true;
     }
+}
+
+// Формула Гаусса вычисления площади выпуклого многоугольника 
+// points : точки вершины многоугольника, отсортированные по углу относительно центра многоугольника
+// Примеч2: нужно, чтобы вершины были отсортированы по углу относительно центра многоугольника
+template <typename T>
+double GaussS(std::vector<Point2D<T>> points)
+{
+    using Point2D = Point2D<T>;
+    double res = 0;
+	for (int i=0; i<points.size(); i++) {
+        Point2D temp;
+        if(i==0) {
+            temp = points[points.size()-1];
+        }
+        else {   
+            temp = points[i-1];
+        }
+        Point2D p2 = points[i];
+		res += (temp.x - p2.x) * (temp.y + p2.y);
+	}
+	return fabs (res) / 2;
 }
 
 #endif

@@ -15,19 +15,31 @@ struct Vect2D {
     Point2D finish;
 
     Vect2D(Point2D start, Point2D finish): start(start),finish(finish){}
-    Point2D V() {
+    Point2D RelativeOrigin() {
         return Point2D(finish.x - start.x, finish.y - start.y);
     }
 
-//    double length() { return sqrt(p1.x*p1.x + p1.y*p1.y); }
-//    void mult(double coeff) {
-//        p2.x = p1.x + V().x * coeff;
-//        p2.y = p1.y + V().y * coeff;
-//    }
+    //double length() { return sqrt(p1.x*p1.x + p1.y*p1.y); }
+
+    void mult(double coeff) {
+       finish.x = start.x + RelativeOrigin().x * coeff;
+       finish.y = start.y + RelativeOrigin().y * coeff;
+   }
+
+
+    double angle(Vect2D<T> vector)
+    {
+        Point2D source = vector.RelativeOrigin();
+        Point2D relative = RelativeOrigin();       
+        double angle =  atan2(source.y, source.x) - atan2(relative.y, relative.x);
+        if (angle < 0) { angle += 2 * M_PI; }
+        return  angle;
+    }
+
     void turn(double angle)
     {
-        double x = V().x * cos(angle) - V().y * sin(angle);
-        double y = V().y * cos(angle) + V().x * sin(angle);
+        double x = RelativeOrigin().x * cos(angle) - RelativeOrigin().y * sin(angle);
+        double y = RelativeOrigin().y * cos(angle) + RelativeOrigin().x * sin(angle);
         finish.x = start.x + x;
         finish.y = start.y + y;
     }

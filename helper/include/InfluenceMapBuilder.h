@@ -18,7 +18,7 @@ class InfluenceMap{
         // sizeX - ширина карты
         // sizeY - высота карты
         // initValue - инициализирующее значение для заполнения ячеек карты 
-        InfluenceMap(int sizeX, int sizeY, T initValue);
+        InfluenceMap(int sizeX, int sizeY, T initValue=0);
         // Деструктор
         ~InfluenceMap();
         // Карта влияния
