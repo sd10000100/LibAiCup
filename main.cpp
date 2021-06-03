@@ -1,4 +1,5 @@
 #include <iostream>
+#include <ctime>
 #include "InfluenceMapBuilder.cpp"
 #include "AStar.cpp"
 
@@ -24,25 +25,44 @@ using namespace pathfind;
 
 int main(int argc, char* argv[])
 {
-	InfluenceMap<int> inf = InfluenceMap<int>(8,8,0);
-	inf.putPotential(5, 1, Point2D<int>(7,1));
-	inf.putPotential(7, 1, Point2D<int>(1,9));
+	InfluenceMap<int> inf = InfluenceMap<int>(5,5);
+	inf.putPotential(2, 1, Point2D<int>(2,1));
+	inf.putPotential(2, 1, Point2D<int>(3,1));
+	std::cout<<"start:"<<std::endl;
 	inf.show();
-	auto dfg = inf.getPointWithMinSum(2, Point2D<int>(7,1));
-	auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
+	// std::vector<Point2D<int>> points;
+	// points.push_back(Point2D<int>(0,0));
+	// points.push_back(Point2D<int>(0,3));
+	// points.push_back(Point2D<int>(4,0));
+
+// 	auto sss = GaussS<int>(points);
+// 		std::cout<<"Gauss:"<<sss<<std::endl;
+
+
+// Vect2D<int> v = Vect2D<int>(Point2D<int>(0,0),Point2D<int>(1,0));
+// Vect2D<int> v2 = Vect2D<int>(Point2D<int>(0,0),Point2D<int>(0,1));
+// 	std::cout<<"angle:"<<v.angle(v2)<<std::endl;
+
+
+	// auto dfg = inf.getPointWithMinSum(2, Point2D<int>(7,1));
+	// auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
 	AStar<int> star = AStar<int>();
-	auto ddd = star.findPath(Point2D<int>(0,0),Point2D<int>(7,7),8,8,inf.field() );
-	for(Point2D<int> p : ddd)
+	unsigned int start_time =  clock();
+	auto ddd = star.findPath(std::make_tuple(0, 0),std::make_tuple(5,5),5,5,inf.field() );
+	unsigned int end_time = clock(); // конечное время
+    unsigned int search_time = end_time - start_time; // искомое время
+	std::cout<<"sec :" <<search_time/1000.0<<std::endl;
+	for(auto p : ddd)
 			{
-				std::cout<<p.x<<" "<<p.y<<std::endl;
+				std::cout<<std::get<0>(p)<<" "<<std::get<1>(p)<<std::endl;
 			}
 	std::cout<<ddd.size()<<std::endl;
 	for (int i=0;i<inf.sizeX();i++) {
         for (int j=0;j<inf.sizeY();j++) {
 			bool isStep = false;
-			for(Point2D<int> p : ddd)
+			for(auto p : ddd)
 			{
-				if(p.x == i && p.y == j)
+				if(std::get<0>(p) == i && std::get<1>(p) == j)
 					isStep = true;
 			}
 			if(isStep)

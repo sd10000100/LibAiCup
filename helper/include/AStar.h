@@ -18,7 +18,7 @@ namespace pathfind
     template<typename T>
     struct PathNode
     {
-        using Vect2D = Point2D<T>;
+        using Vect2D = std::tuple<T, T>;
         // Координаты точки на карте.
         Vect2D position;
         // Длина пути от старта (G).
@@ -46,7 +46,8 @@ namespace pathfind
 
         bool operator == (const PathNode<T> &node)
         {
-            return floor(position.x) == floor(node.position.x) && floor(position.y) == floor(node.position.y);
+            //from = std::make_tuple(floor(std::get<0>(from)), floor(std::get<1>(from)));
+            return floor(std::get<0>(position)) == floor(std::get<0>(node.position)) && floor(std::get<1>(position)) == floor(std::get<1>(node.position));
         }
     };
 
@@ -54,7 +55,7 @@ namespace pathfind
     template<typename T>
     class AStar {
     public :
-        using Vect2D = Point2D<T>;
+        using Vect2D = std::tuple<T, T>;
         using PathNode = PathNode<T>;
         AStar(){};
         // Получить примерное расстояние (H) от точки до цели
