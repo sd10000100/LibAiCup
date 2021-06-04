@@ -10,7 +10,7 @@ using namespace pathfind;
 template<typename T>
 double AStar<T>::getHeuristicPathLength(Vect2D from, Vect2D to)
 {
-    return fabs(from.x - to.x) + fabs(from.y - to.y);
+    return fabs(std::get<0>(from) - std::get<0>(to)) + fabs(std::get<1>(from) - std::get<1>(to));
 }
 
 template<typename T>
@@ -33,7 +33,7 @@ PathNode<T> AStar<T>::getPathNodeWithMinF(std::list<PathNode> list)
 }
 
 template<typename T>
-std::vector<Point2D<T>> AStar<T>::getPathForNode(PathNode pathNode)
+std::vector<std::tuple<T, T>> AStar<T>::getPathForNode(PathNode pathNode)
 {
     //return pathNode.path;
     std::vector<Vect2D> result = {};
@@ -56,8 +56,8 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
     // Соседними точками являются соседние по стороне клетки.
     std::vector<Vect2D> neighbourPoints = {};
 
-    int x = floor(currentPathNode.position.x);
-    int y = floor(currentPathNode.position.y);
+    int x = floor(std::get<0>(currentPathNode.position));
+    int y = floor(std::get<1>(currentPathNode.position));
     neighbourPoints.push_back(Vect2D(x + 1, y));
     neighbourPoints.push_back(Vect2D(x - 1, y));
     neighbourPoints.push_back(Vect2D(x, y + 1));
@@ -73,18 +73,15 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
     for (Vect2D point : neighbourPoints)
     {
         // Проверяем, что не вышли за границы карты.
-        if (point.x < 0 || point.x >= sizeX)
+        if (std::get<0>(point) < 0 || std::get<0>(point) >= sizeX)
             continue;
-        if (point.y < 0 || point.y >= sizeY)
+        if (std::get<1>(point) < 0 || std::get<1>(point) >= sizeY)
             continue;
         PathNode neighbourNode;
-        neighbourNode.position.x = point.x;
-        neighbourNode.position.y = point.y;
-       // neighbourNode.path =  currentPathNode.path;
-        neighbourNode.cameFrom =std::make_shared<pathfind::PathNode<T>>(currentPathNode);
-        //neighbourNode.path.push_back(Vect2D(currentPathNode.position.x, currentPathNode.position.y));
+        neighbourNode.position = point;
+        neighbourNode.cameFrom = std::make_shared<pathfind::PathNode<T>>(currentPathNode);
         neighbourNode.pathLengthFromStart = currentPathNode.pathLengthFromStart +1;
-        neighbourNode.potential =  currentPathNode.potential + field[point.x][point.y];
+        neighbourNode.potential =  currentPathNode.potential + field[std::get<0>(point)][std::get<1>(point)];
         neighbourNode.heuristicEstimatePathLength = getHeuristicPathLength(neighbourNode.position, goal);
         result.push_back(neighbourNode);
     }
@@ -93,28 +90,24 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
 
 //
 template<typename T>
-std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field)
+std::vector<std::tuple<T, T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field)
 {
     // Шаг 1. Создается 2 списка вершин — ожидающие рассмотрения и уже рассмотренные. 
     // В ожидающие добавляется точка старта, список рассмотренных пока пуст.
     std::list<PathNode> idle = {};
     std::list<PathNode> visited = {};
 
-    from.x = floor(from.x);
-    from.y = floor(from.y);
-
-    to.x = floor(to.x);
-    to.y = floor(to.y);
+    from = std::make_tuple(floor(std::get<0>(from)), floor(std::get<1>(from)));
+    to = std::make_tuple(floor(std::get<0>(to)), floor(std::get<1>(to)));
 
     int width = sizeX;
     int height = sizeY;
 
     PathNode startNode = PathNode();
-    //startNode.path = {};
+    startNode.cameFrom = nullptr;
     startNode.position = from;
-    startNode.cameFrom = nullptr;// std::make_shared<pathfind::PathNode<T>>(startNode);
     startNode.pathLengthFromStart = 0;
-    startNode.potential = field[from.x][from.y];
+    startNode.potential = field[std::get<0>(from)][std::get<1>(from)];
     startNode.heuristicEstimatePathLength = getHeuristicPathLength(from, to);
             
     idle.push_back(startNode);
@@ -123,7 +116,7 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
         // Шаг 2. Для каждой точки рассчитывается F = G + H. G — расстояние от старта до точки, H — примерное расстояние от точки до цели
         // Шаг 3. Из списка точек на рассмотрение выбирается точка с наименьшим F
         PathNode currentNode = getPathNodeWithMinF(idle);
-        if (floor(currentNode.position.x) == floor(to.x) && floor(currentNode.position.y) == floor(to.y)) {
+        if (floor(std::get<0>(currentNode.position)) == floor(std::get<0>(to)) && floor(std::get<1>(currentNode.position)) == floor(std::get<1>(to))) {
             // Шаг 4. Если точка — цель, то мы нашли маршрут
             return getPathForNode(currentNode);
         }
@@ -133,7 +126,7 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
         visited.push_back(currentNode);
 
         // Шаг 6. Получаем список соседних точек
-        auto neighs = getNeighbours(currentNode, to, width, height, field, false);
+        auto neighs = getNeighbours(currentNode, to, width, height, field, true);
         for (auto neighbourNode : neighs) {
             // Шаг 7. Если соседняя точка уже находится в рассмотренных — пропускаем ее
             auto visitedNodeIter = std::find(visited.begin(), visited.end(), neighbourNode);
@@ -147,8 +140,7 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
             {
                 // Шаг 9.Если же соседняя точка в списке на рассмотрение — 
                 // проверяем, если пришли более коротким путем, заменяем предыдущиую точку и путь
-                //idleNodeIter->path = neighbourNode.path;
-                startNode.cameFrom = std::make_shared<pathfind::PathNode<T>>(neighbourNode);
+                idleNodeIter->cameFrom = std::make_shared<pathfind::PathNode<T>>(neighbourNode);
                 idleNodeIter->pathLengthFromStart = neighbourNode.pathLengthFromStart;
             }
         }

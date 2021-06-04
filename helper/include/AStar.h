@@ -5,12 +5,11 @@
 #ifndef LIBAICUP_ASTAR_H
 #define LIBAICUP_ASTAR_H
 
-#include "vector"
+#include <vector>
 #include <cmath>
 #include <list>
 #include <memory>
 #include <algorithm>
-#include "Point2D.h"
 
 namespace pathfind
 {
@@ -18,15 +17,13 @@ namespace pathfind
     template<typename T>
     struct PathNode
     {
-        using Vect2D = Point2D<T>;
+        using Vect2D = std::tuple<T, T>;
         // Координаты точки на карте.
         Vect2D position;
         // Длина пути от старта (G).
         double pathLengthFromStart=10000;
         // Точка, из которой пришли в эту точку.
         std::shared_ptr<PathNode<T>> cameFrom;
-        // Весь путь до точки
-        std::vector<Vect2D> path = {};
         // Примерное расстояние до цели (H).
         double heuristicEstimatePathLength= 0;
         // Вес на данной точке (на взвешенной карте)
@@ -46,7 +43,7 @@ namespace pathfind
 
         bool operator == (const PathNode<T> &node)
         {
-            return floor(position.x) == floor(node.position.x) && floor(position.y) == floor(node.position.y);
+            return floor(std::get<0>(position)) == floor(std::get<0>(node.position)) && floor(std::get<1>(position)) == floor(std::get<1>(node.position));
         }
     };
 
@@ -54,7 +51,7 @@ namespace pathfind
     template<typename T>
     class AStar {
     public :
-        using Vect2D = Point2D<T>;
+        using Vect2D = std::tuple<T, T>;
         using PathNode = PathNode<T>;
         AStar(){};
         // Получить примерное расстояние (H) от точки до цели
