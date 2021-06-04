@@ -36,16 +36,18 @@ template<typename T>
 std::vector<Point2D<T>> AStar<T>::getPathForNode(PathNode pathNode)
 {
     // В целях экономии возможно придется переписать
-    return pathNode.path;
-//    std::vector<Vect2D> result = {};
-//    PathNode* currentNode = &pathNode;
-//    while (currentNode != nullptr)
-//    {
-//        result.push_back(currentNode->Position);
-//        *currentNode =  *currentNode->CameFrom;
-//    }
-//    std::reverse(std::begin(result), std::end(result));
-//    return result;
+    //return pathNode.path;
+    std::vector<Vect2D> result = {};
+   PathNode* currentNode = &pathNode;
+   while (currentNode->cameFrom!=nullptr)
+   //while (!(currentNode->position.x==currentNode->cameFrom->position.x && currentNode->position.y==currentNode->cameFrom->position.y))
+   {
+       result.push_back(currentNode->position);
+       *currentNode =  *currentNode->cameFrom;
+   }
+   result.push_back(currentNode->position);
+   std::reverse(std::begin(result), std::end(result));
+   return result;
 }
 
 template<typename T>
@@ -80,8 +82,9 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
         PathNode neighbourNode;
         neighbourNode.position.x = point.x;
         neighbourNode.position.y = point.y;
-        neighbourNode.path =  currentPathNode.path;
-        neighbourNode.path.push_back(Vect2D(currentPathNode.position.x, currentPathNode.position.y));
+       // neighbourNode.path =  currentPathNode.path;
+        neighbourNode.cameFrom =std::make_shared<pathfind::PathNode<T>>(currentPathNode);
+        //neighbourNode.path.push_back(Vect2D(currentPathNode.position.x, currentPathNode.position.y));
         neighbourNode.pathLengthFromStart = currentPathNode.pathLengthFromStart +1;
         neighbourNode.potential =  currentPathNode.potential + field[point.x][point.y];
         neighbourNode.heuristicEstimatePathLength = getHeuristicPathLength(neighbourNode.position, goal);
@@ -109,8 +112,9 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
     int height = sizeY;
 
     PathNode startNode = PathNode();
-    startNode.path = {};
+    //startNode.path = {};
     startNode.position = from;
+    startNode.cameFrom = nullptr;// std::make_shared<pathfind::PathNode<T>>(startNode);
     startNode.pathLengthFromStart = 0;
     startNode.potential = field[from.x][from.y];
     startNode.heuristicEstimatePathLength = getHeuristicPathLength(from, to);
@@ -145,7 +149,8 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
             {
                 // Шаг 9.Если же соседняя точка в списке на рассмотрение — 
                 // проверяем, если пришли более коротким путем, заменяем предыдущиую точку и путь
-                idleNodeIter->path = neighbourNode.path;
+                //idleNodeIter->path = neighbourNode.path;
+                startNode.cameFrom = std::make_shared<pathfind::PathNode<T>>(neighbourNode);
                 idleNodeIter->pathLengthFromStart = neighbourNode.pathLengthFromStart;
             }
         }

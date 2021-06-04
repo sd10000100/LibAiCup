@@ -1,6 +1,7 @@
 #include <iostream>
 #include "InfluenceMapBuilder.cpp"
 #include "AStar.cpp"
+#include <ctime>
 
 using namespace pathfind;
 
@@ -24,36 +25,41 @@ using namespace pathfind;
 
 int main(int argc, char* argv[])
 {
-	InfluenceMap<int> inf = InfluenceMap<int>(8,8,0);
-	inf.putPotential(5, 1, Point2D<int>(7,1));
+	InfluenceMap<int> inf = InfluenceMap<int>(2000,2000,0);
+	inf.putPotential(8, 1, Point2D<int>(7,1));
 	inf.putPotential(7, 1, Point2D<int>(1,9));
-	inf.show();
+	//inf.show();
 	auto dfg = inf.getPointWithMinSum(2, Point2D<int>(7,1));
 	auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
 	AStar<int> star = AStar<int>();
-	auto ddd = star.findPath(Point2D<int>(0,0),Point2D<int>(7,7),8,8,inf.field() );
-	for(Point2D<int> p : ddd)
-			{
-				std::cout<<p.x<<" "<<p.y<<std::endl;
-			}
-	std::cout<<ddd.size()<<std::endl;
-	for (int i=0;i<inf.sizeX();i++) {
-        for (int j=0;j<inf.sizeY();j++) {
-			bool isStep = false;
-			for(Point2D<int> p : ddd)
-			{
-				if(p.x == i && p.y == j)
-					isStep = true;
-			}
-			if(isStep)
-            	std::cout<< RED<<inf.field()[i][j]<< RESET<<" ";
-			else
-			{
-				std::cout<< inf.field()[i][j]<< " ";
-			}
+	std::cout<<"startss:"<<std::endl;
+	unsigned int start_time =  clock();
+	auto ddd = star.findPath(Point2D<int>(0,0),Point2D<int>(1999,1999),2000,2000,inf.field() );
+	unsigned int end_time = clock(); // конечное время
+    unsigned int search_time = end_time - start_time; // искомое время
+	std::cout<<"sec :" <<search_time/1000.0<<std::endl;
+	// for(Point2D<int> p : ddd)
+	// 		{
+	// 			std::cout<<p.x<<" "<<p.y<<std::endl;
+	// 		}
+	// std::cout<<ddd.size()<<std::endl;
+	// for (int i=0;i<inf.sizeX();i++) {
+    //     for (int j=0;j<inf.sizeY();j++) {
+	// 		bool isStep = false;
+	// 		for(Point2D<int> p : ddd)
+	// 		{
+	// 			if(p.x == i && p.y == j)
+	// 				isStep = true;
+	// 		}
+	// 		if(isStep)
+    //         	std::cout<< RED<<inf.field()[i][j]<< RESET<<" ";
+	// 		else
+	// 		{
+	// 			std::cout<< inf.field()[i][j]<< " ";
+	// 		}
 			
-        }
-        std::cout<<std::endl;
-    }
+    //     }
+    //     std::cout<<std::endl;
+    // }
 	return 0;
 }
