@@ -35,17 +35,15 @@ PathNode<T> AStar<T>::getPathNodeWithMinF(std::list<PathNode> list)
 template<typename T>
 std::vector<Point2D<T>> AStar<T>::getPathForNode(PathNode pathNode)
 {
-    // В целях экономии возможно придется переписать
     //return pathNode.path;
     std::vector<Vect2D> result = {};
    PathNode* currentNode = &pathNode;
    while (currentNode->cameFrom!=nullptr)
-   //while (!(currentNode->position.x==currentNode->cameFrom->position.x && currentNode->position.y==currentNode->cameFrom->position.y))
    {
        result.push_back(currentNode->position);
        *currentNode =  *currentNode->cameFrom;
    }
-   result.push_back(currentNode->position);
+   //result.push_back(currentNode->position);
    std::reverse(std::begin(result), std::end(result));
    return result;
 }
@@ -135,7 +133,7 @@ std::vector<Point2D<T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, in
         visited.push_back(currentNode);
 
         // Шаг 6. Получаем список соседних точек
-        auto neighs = getNeighbours(currentNode, to, width, height, field, true);
+        auto neighs = getNeighbours(currentNode, to, width, height, field, false);
         for (auto neighbourNode : neighs) {
             // Шаг 7. Если соседняя точка уже находится в рассмотренных — пропускаем ее
             auto visitedNodeIter = std::find(visited.begin(), visited.end(), neighbourNode);
