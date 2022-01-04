@@ -84,6 +84,7 @@ bool InfluenceMap<T>::isCorrectCoordinate(int x, int y)
     return false;
 }
 
+//put square potential
 template<typename T>
 void InfluenceMap<T>::putPotential(double power, double step, Point2D point)
 {

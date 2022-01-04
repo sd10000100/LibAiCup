@@ -2,6 +2,7 @@
 #include "InfluenceMapBuilder.cpp"
 #include "AStar.cpp"
 #include <ctime>
+#include <vector>
 
 using namespace pathfind;
 
@@ -23,8 +24,31 @@ using namespace pathfind;
 #define BOLDCYAN    "\033[1m\033[36m"      /* Bold Cyan */
 #define BOLDWHITE   "\033[1m\033[37m"      /* Bold White */
 
+
+template<class FwdIt>
+FwdIt remove_nth(FwdIt p, FwdIt q, size_t n)
+{
+    if(distance(p,q)<n)
+        return q;
+    //first = std::find_if(p, q, p);
+	int j=0;
+	if (p != q)
+		for(FwdIt i = p; ++i != q; j++)
+			if (j==n)
+				*p++ = std::move(*i);
+	return p;
+}
+
+
+
 int main(int argc, char* argv[])
 {
+InfluenceMap<int> inf2 = InfluenceMap<int>(8,8,0);
+	inf2.putPotential(3, 1, Point2D<int>(4,4));
+	//inf2.putPotential(7, 1, Point2D<int>(1,9));
+	inf2.show();
+	
+
 	InfluenceMap<int> inf = InfluenceMap<int>(2000,2000,0);
 	inf.putPotential(8, 1, Point2D<int>(7,1));
 	inf.putPotential(7, 1, Point2D<int>(1,9));

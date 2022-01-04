@@ -1,9 +1,14 @@
+//**************************************
+// Written for Russian Ai Cups with love 
+// for horses and pain in the knees
+// by sd10000100 on 15.01.2020.
 //
-// Created by badru on 15.01.2020.
-// Классы узла карты и поиска пути. Обьявление
+// А* поиск пути
+//**************************************
 
-#ifndef LIBAICUP_ASTAR_H
-#define LIBAICUP_ASTAR_H
+// TODO: схлопнуть в один файл для всяких других конкурсов
+
+#pragma once
 
 #include <vector>
 #include <cmath>
@@ -89,4 +94,3 @@ namespace pathfind
         std::vector<Vect2D> findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field);
     };
 }
-#endif

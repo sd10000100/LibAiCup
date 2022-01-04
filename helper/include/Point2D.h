@@ -1,9 +1,14 @@
+//**************************************
+// Written for Russian Ai Cups with love 
+// for horses and pain in the knees
+// by sd10000100 on 18.01.2020.
 //
-// Created by badru on 18.01.2020.
-//
+// Класс точки
+//**************************************
 
-#ifndef LIBAICUP_POINT2D_H
-#define LIBAICUP_POINT2D_H
+// TODO: Сделать повариабельнее шаблон, и конвертацию из и в tuple
+
+#pragma once
 #include "math.h"
 
 template<typename T>
@@ -78,4 +83,3 @@ struct Point2D {
         return distTo(p.x, p.y);
     }
 };
-#endif

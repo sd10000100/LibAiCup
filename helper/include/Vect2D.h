@@ -1,12 +1,17 @@
+//**************************************
+// Written for Russian Ai Cups with love 
+// for horses and pain in the knees
+// by sd10000100 on 18.01.2020.
 //
-// Created by badru on 18.01.2020.
-//
+// Классы узла карты и поиска пути
+//**************************************
 
-#ifndef LIBAICUP_VECT2D_H
-#define LIBAICUP_VECT2D_H
+
+#pragma once
 
 #include "Point2D.h"
 // TODO: дописать а то несолидно
+// TODO: Сделать повариабельнее шаблон, и конвертацию из и в tuple
 
 template<typename T>
 struct Vect2D {
@@ -44,4 +49,3 @@ struct Vect2D {
         finish.y = start.y + y;
     }
 };
-#endif

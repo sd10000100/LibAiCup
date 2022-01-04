@@ -1,9 +1,17 @@
+//**************************************
+// Written for Russian Ai Cups with love 
+// for horses and pain in the knees
+// by sd10000100 on 15.01.2020.
 //
-// Created by badru on 15.01.2020.
-//
+// Потенциальное поле (карта влияния)
+//**************************************
 
-#ifndef LIBAICUP_INFLUENCEMAPBUILDER_H
-#define LIBAICUP_INFLUENCEMAPBUILDER_H
+//TODO: переписать методы внедрения потенциала по квадрату
+//      добавить методы внедрения потенциала по ромбу
+//      добавить методы внедрения потенциала по кругу
+//      переписать методы для определения оптимального направления 
+//          (или астар уже тут бацать?)
+#pragma once
 
 #include <cmath>
 #include <vector>
@@ -67,7 +75,3 @@ class InfluenceMap{
         double getAvgValue(double oldV, double newV);
         bool isCorrectCoordinate(int x, int y);
 };
-
-
-
-#endif

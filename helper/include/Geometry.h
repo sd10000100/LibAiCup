@@ -1,15 +1,35 @@
+//**************************************
+// Written for Russian Ai Cups with love 
+// for horses and pain in the knees
+// by sd10000100 on 15.01.2020.
 //
-// Created by sd10000100 on 15.01.2020.
-//
-#ifndef LIBAICUP_GEOMETRY_H
-#define LIBAICUP_GEOMETRY_H
+// Геометрические функции
+//**************************************
+
+//TODO: переписать для более универсального класса вектора
+#pragma once
 #include "Vect2D.h"
+#include <tuple>
+
+// Случайное целое число [a,b]
+int random_int(int a, int b){
+    return rand() % (b - a + 1) + a;
+}
 
 // расстояние между 2-мя точками
 template<typename T>
 double distanceSqr(Point2D<T> a, Point2D<T> b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
+
+double distanceSqr(std::tuple<int, int> a, std::tuple<int, int> b) {
+    return (std::get<0>(a) - std::get<0>(b)) * (std::get<0>(a) - std::get<0>(b)) + (std::get<1>(a) - std::get<1>(b)) * (std::get<1>(a) - std::get<1>(b));
+}
+
+double distance(std::tuple<int, int> a, std::tuple<int, int> b) {
+    return sqrt((std::get<0>(a) - std::get<0>(b)) * (std::get<0>(a) - std::get<0>(b)) + (std::get<1>(a) - std::get<1>(b)) * (std::get<1>(a) - std::get<1>(b)));
+}
+
 
 // ориентированная площадь треугольника
 // Исп-я понятие косого (псевдополяр) произвед векторов
@@ -149,5 +169,3 @@ double GaussS(std::vector<Point2D<T>> points)
 	}
 	return fabs (res) / 2;
 }
-
-#endif
