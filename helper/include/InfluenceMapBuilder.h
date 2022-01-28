@@ -16,17 +16,18 @@
 #include <cmath>
 #include <vector>
 #include "Geometry.h"
+#include <tuple>
 
-template<typename T>
+using namespace std;
+
 class InfluenceMap{
-    using Point2D = Point2D<T>;
 
     public:
         // Создание потенциального поля 
         // sizeX - ширина карты
         // sizeY - высота карты
         // initValue - инициализирующее значение для заполнения ячеек карты 
-        InfluenceMap(int sizeX, int sizeY, T initValue=0);
+        InfluenceMap(int sizeX, int sizeY, double initValue=0);
         // Деструктор
         ~InfluenceMap();
         // Карта влияния
@@ -39,32 +40,32 @@ class InfluenceMap{
         void show();
         // Очистить карту, заполнив указанным значением
         // initValue - инициализирующее значение для заполнения ячеек карты 
-        void clear(T initValue);
+        void clear(double initValue);
 
         // Нанести потенциал на карту. 
         // Ячейка заполняется максимальным потенциалом из нанесенных
         // power - сила потенциала
         // step - на сколько затухает сила потенциала с каждой волной на карте
         // point - точка нанесения потенциала на карту
-        void putPotential(double power, double step, Point2D point);
+        void putPotential(double power, double step, tuple<int,int> point);
 
         // Нанести потенциал на карту. 
         // Ячейка заполняется средним потенциалом из нового и нанесенных
         // power - сила потенциала
         // step - на сколько затухает сила потенциала с каждой волной на карте
         // point - точка нанесения потенциала на карту
-        void putAvgPotential(double power, double step, Point2D point);
+        void putAvgPotential(double power, double step, tuple<int,int> point);
 
         // Получить сумму ячеек на пути из точки from в точку to
         // from, to - начальная и конечная точки
         // Result - сумма ячеек на пути из точки from в точку to
-        double getSumOfVectorPath(Point2D from, Point2D to);
+        double getSumOfVectorPath(tuple<int,int> from, tuple<int,int> to);
 
         // Получить точку на расстоянии radius с минимальным потенциалом
         // radius - на каком радиусе искать точку
         // source - точка, из которой ищется направление
         // Result - точка на расстоянии radius с минимальным потенциалом
-        Point2D getPointWithMinSum(int radius, Point2D source);
+        tuple<int,int> getPointWithMinSum(int radius, tuple<int,int> source);
     private:
         double** field_; //T** ?
         int sizeX_;

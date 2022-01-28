@@ -1,8 +1,9 @@
 #include <iostream>
-#include "InfluenceMapBuilder.cpp"
-#include "AStar.cpp"
+#include "InfluenceMapBuilder.h"
+#include "AStar.h"
 #include <ctime>
 #include <vector>
+#include <tuple>
 
 using namespace pathfind;
 
@@ -43,19 +44,19 @@ FwdIt remove_nth(FwdIt p, FwdIt q, size_t n)
 
 int main(int argc, char* argv[])
 {
-InfluenceMap<int> inf2 = InfluenceMap<int>(8,8,0);
-	inf2.putPotential(3, 1, Point2D<int>(4,4));
+InfluenceMap inf2 = InfluenceMap(8,8,0);
+	inf2.putPotential(3, 1, std::make_tuple(4,4));
 	//inf2.putPotential(7, 1, Point2D<int>(1,9));
 	inf2.show();
 	
 
-	InfluenceMap<int> inf = InfluenceMap<int>(2000,2000,0);
-	inf.putPotential(8, 1, Point2D<int>(7,1));
-	inf.putPotential(7, 1, Point2D<int>(1,9));
+	InfluenceMap inf = InfluenceMap(2000,2000,0);
+	inf.putPotential(8, 1, std::make_tuple(7,1));
+	inf.putPotential(7, 1, std::make_tuple(1,9));
 	//inf.show();
-	auto dfg = inf.getPointWithMinSum(2, Point2D<int>(7,1));
+	auto dfg = inf.getPointWithMinSum(2, std::make_tuple(7,1));
 	auto vvv = distanceSqr(Point2D<int>(7,1),Point2D<int>(1,9));
-	AStar<int> star = AStar<int>();
+	AStar star = AStar();
 	std::cout<<"startss:"<<std::endl;
 	unsigned int start_time =  clock();
 	auto ddd = star.findPath(std::make_tuple(0, 0),std::make_tuple(1999,1999),2000,2000,inf.field() );

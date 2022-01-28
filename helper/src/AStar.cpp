@@ -7,14 +7,12 @@
 
 using namespace pathfind;
 
-template<typename T>
-double AStar<T>::getHeuristicPathLength(Vect2D from, Vect2D to)
+double AStar::getHeuristicPathLength(std::tuple<int, int> from, std::tuple<int, int> to)
 {
     return fabs(std::get<0>(from) - std::get<0>(to)) + fabs(std::get<1>(from) - std::get<1>(to));
 }
 
-template<typename T>
-PathNode<T> AStar<T>::getPathNodeWithMinF(std::list<PathNode> list)
+PathNode AStar::getPathNodeWithMinF(std::list<PathNode> list)
 {
     PathNode minElem;
     double minVal = 10000;
@@ -32,8 +30,7 @@ PathNode<T> AStar<T>::getPathNodeWithMinF(std::list<PathNode> list)
     return minElem;
 }
 
-template<typename T>
-std::vector<std::tuple<T, T>> AStar<T>::getPathForNode(PathNode pathNode)
+std::vector<std::tuple<int, int>> AStar::getPathForNode(PathNode pathNode)
 {
     //return pathNode.path;
     std::vector<Vect2D> result = {};
@@ -48,8 +45,7 @@ std::vector<std::tuple<T, T>> AStar<T>::getPathForNode(PathNode pathNode)
    return result;
 }
 
-template<typename T>
-std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2D goal,int sizeX, int sizeY, const double** field, bool isDiag)
+std::vector<PathNode> AStar::getNeighbours(PathNode currentPathNode, Vect2D goal,int sizeX, int sizeY, const double** field, bool isDiag)
 {
     std::vector<PathNode> result ={};
 
@@ -79,7 +75,7 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
             continue;
         PathNode neighbourNode;
         neighbourNode.position = point;
-        neighbourNode.cameFrom = std::make_shared<pathfind::PathNode<T>>(currentPathNode);
+        neighbourNode.cameFrom = std::make_shared<pathfind::PathNode>(currentPathNode);
         neighbourNode.pathLengthFromStart = currentPathNode.pathLengthFromStart +1;
         neighbourNode.potential =  currentPathNode.potential + field[std::get<0>(point)][std::get<1>(point)];
         neighbourNode.heuristicEstimatePathLength = getHeuristicPathLength(neighbourNode.position, goal);
@@ -88,9 +84,7 @@ std::vector<PathNode<T>> AStar<T>::getNeighbours(PathNode currentPathNode, Vect2
     return result;
 }
 
-//
-template<typename T>
-std::vector<std::tuple<T, T>> AStar<T>::findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field)
+std::vector<std::tuple<int, int>> AStar::findPath(Vect2D from, Vect2D to, int sizeX, int sizeY,const double** field)
 {
     // Шаг 1. Создается 2 списка вершин — ожидающие рассмотрения и уже рассмотренные. 
     // В ожидающие добавляется точка старта, список рассмотренных пока пуст.
@@ -140,7 +134,7 @@ std::vector<std::tuple<T, T>> AStar<T>::findPath(Vect2D from, Vect2D to, int siz
             {
                 // Шаг 9.Если же соседняя точка в списке на рассмотрение — 
                 // проверяем, если пришли более коротким путем, заменяем предыдущиую точку и путь
-                idleNodeIter->cameFrom = std::make_shared<pathfind::PathNode<T>>(neighbourNode);
+                idleNodeIter->cameFrom = std::make_shared<pathfind::PathNode>(neighbourNode);
                 idleNodeIter->pathLengthFromStart = neighbourNode.pathLengthFromStart;
             }
         }

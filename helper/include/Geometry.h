@@ -11,8 +11,10 @@
 #include "Vect2D.h"
 #include <tuple>
 
+using namespace std;
+
 // Случайное целое число [a,b]
-int random_int(int a, int b){
+inline int random_int(int a, int b){
     return rand() % (b - a + 1) + a;
 }
 
@@ -22,11 +24,11 @@ double distanceSqr(Point2D<T> a, Point2D<T> b) {
     return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y);
 }
 
-double distanceSqr(std::tuple<int, int> a, std::tuple<int, int> b) {
+inline double distanceSqr(std::tuple<int, int> a, std::tuple<int, int> b) {
     return (std::get<0>(a) - std::get<0>(b)) * (std::get<0>(a) - std::get<0>(b)) + (std::get<1>(a) - std::get<1>(b)) * (std::get<1>(a) - std::get<1>(b));
 }
 
-double distance(std::tuple<int, int> a, std::tuple<int, int> b) {
+inline double distance(std::tuple<int, int> a, std::tuple<int, int> b) {
     return sqrt((std::get<0>(a) - std::get<0>(b)) * (std::get<0>(a) - std::get<0>(b)) + (std::get<1>(a) - std::get<1>(b)) * (std::get<1>(a) - std::get<1>(b)));
 }
 
@@ -43,12 +45,17 @@ double orientedArea (Point2D<T> a, Point2D<T> b, Point2D<T> c) {
     return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
+inline double orientedAreaInt (tuple<int,int> a, tuple<int,int> b, tuple<int,int> c) {
+    return (get<0>(b) - get<0>(a)) * (get<1>(c) - get<1>(a)) - (get<1>(b)- get<1>(a)) * (get<0>(c) - get<0>(a));
+}
+
 // проверка, что точки не лежат на одной плоскости
-bool isPointNotOnSamePlane (double a, double b, double c, double d) {
+inline bool isPointNotOnSamePlane (double a, double b, double c, double d) {
     if (a > b) std::swap(a, b);
     if (c > d) std::swap(c, d);
     return std::max(a, c) <= std::min(b, d);
 }
+
 
 // Чтобы отрезки AB и CD пересекались, нид чтобы A и B находились
 // по разные стороны от прямой CD и аналогично C и D по разные стороны от AB
@@ -59,6 +66,17 @@ bool intersect (Point2D<T> a, Point2D<T> b, Point2D<T> c, Point2D<T> d) {
            && isPointNotOnSamePlane (a.y, b.y, c.y, d.y)
            && orientedArea<T>(a,b,c) * orientedArea<T>(a,b,d) <= 0
            && orientedArea<T>(c,d,a) * orientedArea<T>(c,d,b) <= 0;
+}
+
+
+// Чтобы отрезки AB и CD пересекались, нид чтобы A и B находились
+// по разные стороны от прямой CD и аналогично C и D по разные стороны от AB
+// Нужно вычислить ориентированные площади треугольников и сравнить знаки
+inline bool intersectInt (tuple<int,int> a, tuple<int,int> b, tuple<int,int> c, tuple<int,int> d) {
+    return isPointNotOnSamePlane (get<0>(a), get<0>(b), get<0>(c), get<0>(d))
+           && isPointNotOnSamePlane (get<1>(a), get<1>(b), get<1>(c), get<1>(d))
+           && orientedAreaInt(a,b,c) * orientedAreaInt(a,b,d) <= 0
+           && orientedAreaInt(c,d,a) * orientedAreaInt(c,d,b) <= 0;
 }
 
 // проверка на нахождение точки внутри треугольника (подходит для выпуклых многоугольников)

@@ -14,21 +14,20 @@
 #include <cmath>
 #include <list>
 #include <memory>
+#include <tuple>
 #include <algorithm>
 
 namespace pathfind
 {
     // Узел на карте поиска пути
-    template<typename T>
     struct PathNode
     {
-        using Vect2D = std::tuple<T, T>;
         // Координаты точки на карте.
-        Vect2D position;
+        std::tuple<int, int> position;
         // Длина пути от старта (G).
         double pathLengthFromStart=10000;
         // Точка, из которой пришли в эту точку.
-        std::shared_ptr<PathNode<T>> cameFrom;
+        std::shared_ptr<PathNode> cameFrom;
         // Примерное расстояние до цели (H).
         double heuristicEstimatePathLength= 0;
         // Вес на данной точке (на взвешенной карте)
@@ -46,18 +45,16 @@ namespace pathfind
             return estimateFullPathLength()<node.estimateFullPathLength();
         }
 
-        bool operator == (const PathNode<T> &node)
+        bool operator == (const PathNode &node)
         {
             return floor(std::get<0>(position)) == floor(std::get<0>(node.position)) && floor(std::get<1>(position)) == floor(std::get<1>(node.position));
         }
     };
 
     // Класс поиска пути
-    template<typename T>
     class AStar {
     public :
-        using Vect2D = std::tuple<T, T>;
-        using PathNode = PathNode<T>;
+        using Vect2D = std::tuple<int, int>;
         AStar(){};
         // Получить примерное расстояние (H) от точки до цели
         // from - точка, от которой вычисляется расстояние
