@@ -1,4 +1,4 @@
-#include "InfluenceMapBuilder.h"
+#include "InfluenceMap.h"
 #include <iostream>
 
 const double** InfluenceMap::field(){
@@ -178,8 +178,7 @@ double InfluenceMap::getSumOfVectorPath(tuple<int,int> fromV, tuple<int,int> toV
 tuple<int,int> InfluenceMap::getPointWithMinSum(int radius, tuple<int,int> source) {
 
     double min = 10000;
-    //TODO:
-    tuple<int,int> minPos = source;
+    tuple<int,int> minPos = make_tuple(get<0>(source),get<1>(source));
     int x = int(abs(floor(get<0>(source))));
     int y = int(abs(floor(get<1>(source))));
 

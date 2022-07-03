@@ -1,5 +1,5 @@
 #include <iostream>
-#include "InfluenceMapBuilder.h"
+#include "InfluenceMap.h"
 #include "AStar.h"
 #include <ctime>
 #include <vector>
