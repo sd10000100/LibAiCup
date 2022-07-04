@@ -27,7 +27,10 @@ struct Vect2D {
         //return Point2D(finish.x - start.x, finish.y - start.y);
     }
 
-    //double length() { return sqrt(p1.x*p1.x + p1.y*p1.y); }
+    double length() { 
+        return sqrt((std::get<0>(finish)-std::get<0>(start))*(std::get<0>(finish)-std::get<0>(start)) + 
+                    (std::get<1>(finish)-std::get<1>(start))*(std::get<1>(finish)-std::get<1>(start)) ); 
+    }
 
     void mult(double coeff) {
         finish = std::make_tuple(std::get<0>(start)+std::get<0>(RelativeOrigin())*coeff, std::get<1>(start)+std::get<1>(RelativeOrigin())*coeff ) ;
@@ -46,10 +49,13 @@ struct Vect2D {
         return  angle;
     }
 
+    //angle - in radians!
+    //radian = degree*PI/180
     void turn(double angle)
     {
-        double x = RelativeOrigin().x * cos(angle) - RelativeOrigin().y * sin(angle);
-        double y = RelativeOrigin().y * cos(angle) + RelativeOrigin().x * sin(angle);
+        Point2D relative = this->RelativeOrigin();
+        double x = std::get<0>(relative) * cos(angle) - std::get<1>(relative) * sin(angle);
+        double y = std::get<1>(relative) * cos(angle) + std::get<0>(relative) * sin(angle);
         // finish.x = start.x + x;
         // finish.y = start.y + y;
         finish = std::make_tuple(std::get<0>(start)+x, std::get<1>(start)+y);

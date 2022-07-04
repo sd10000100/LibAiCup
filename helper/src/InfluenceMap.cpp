@@ -103,6 +103,38 @@ void InfluenceMap::putPotential(double power, double step, tuple<int,int> point)
     }
 }
 
+void InfluenceMap::putPotentialOnSquare(double power, double step, tuple<int,int> point)
+{
+    int s = step+1;
+    int x = int(abs(floor(get<0>(point))));
+    int y = int(abs(floor(get<1>(point))));
+        for(int temp = y-s;temp<=s+y;temp++)
+        {
+            int tempArrMinX = int(floor(x-s));
+            int tempArrMaxX = int(floor(x+s));
+            if(isCorrectCoordinate(tempArrMinX, temp))
+                field_[tempArrMinX][temp]=power;
+            if(isCorrectCoordinate(tempArrMaxX, temp))
+                field_[tempArrMaxX][temp]=power;
+        }
+        for(int temp = x-s+1;temp<=s+x-1;temp++)
+        {
+            int tempArrMinY = int(floor(y-s));
+            int tempArrMaxY = int(floor(y+s));
+            if(isCorrectCoordinate(temp, tempArrMinY))
+                field_[temp][tempArrMinY]=power;
+            if(isCorrectCoordinate(temp, tempArrMaxY))
+                field_[temp][tempArrMaxY]=power;
+        }
+}
+
+void InfluenceMap::putPoint(double power, tuple<int,int> point)
+{
+    int x = get<0>(point);
+    int y = get<1>(point);
+    field_[x][y]=power;
+}
+
 double InfluenceMap::getAvgValue(double oldV, double newV)
 {
     if(oldV==behindWallValue_)

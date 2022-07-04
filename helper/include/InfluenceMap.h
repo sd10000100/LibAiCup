@@ -49,6 +49,20 @@ class InfluenceMap{
         // point - точка нанесения потенциала на карту
         void putPotential(double power, double step, tuple<int,int> point);
 
+        // Нанести потенциал на карту по квадрату. 
+        // Ячейка заполняется значением power по сторонам квадрата с половиной стороны step
+        // power - сила потенциала
+        // step - половина стороны квадрата
+        // point - точка нанесения потенциала на карту
+        void putPotentialOnSquare(double power, double step, tuple<int,int> point);
+
+
+        // Нанести точечный потенциал на карту. 
+        // Ячейка заполняется введенным значением
+        // power - сила потенциала
+        // point - точка нанесения потенциала на карту
+        void putPoint(double power, tuple<int,int> point);
+
         // Нанести потенциал на карту. 
         // Ячейка заполняется средним потенциалом из нового и нанесенных
         // power - сила потенциала
